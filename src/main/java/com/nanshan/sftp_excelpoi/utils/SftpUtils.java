@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SftpUtils {
 
+    private static final String SFTP_CHANNEL_TYPE = "sftp";
+
     public void downloadFileSftp(String host, int port, String username, String password, String remoteFilePath, String localFilePath) {
         com.jcraft.jsch.JSch jsch = new JSch();
         com.jcraft.jsch.Session session = null;
@@ -27,11 +29,42 @@ public class SftpUtils {
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
 
-            channelSftp = (ChannelSftp) session.openChannel("sftp");
+            channelSftp = (ChannelSftp) session.openChannel(SFTP_CHANNEL_TYPE);
             channelSftp.connect();
 
             channelSftp.get(remoteFilePath, localFilePath);
             System.out.println("File downloaded successfully.");
+        } catch (JSchException | SftpException e) {
+            e.printStackTrace();
+        } finally {
+            if (channelSftp != null) {
+                channelSftp.disconnect();
+            }
+            if (session != null) {
+                session.disconnect();
+            }
+        }
+    }
+
+    public void uploadFile(String host, int port, String username, String password, String localFilePath, String remoteFilePath) {
+        com.jcraft.jsch.JSch jsch = new JSch();
+        com.jcraft.jsch.Session session = null;
+        ChannelSftp channelSftp = null;
+
+        try {
+            session = jsch.getSession(username, host, port);
+            session.setPassword(password);
+
+            // StrictHostKeyChecking 為 "ask" (預設) → 首次連接到伺服器時，SSH 客戶端會詢問你是否信任該伺服器的主機密鑰
+            // StrictHostKeyChecking 設定為 "no" 則是關閉了這種驗證機制，表示不再詢問用戶是否信任伺服器的主機密鑰
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect();
+
+            channelSftp = (ChannelSftp) session.openChannel(SFTP_CHANNEL_TYPE);
+            channelSftp.connect();
+
+            channelSftp.put(localFilePath, remoteFilePath);
+            System.out.println("File uploaded successfully.");
         } catch (JSchException | SftpException e) {
             e.printStackTrace();
         } finally {
