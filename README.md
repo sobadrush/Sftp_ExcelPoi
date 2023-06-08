@@ -24,3 +24,4 @@ zelda:sa123456:1001
 | 3 |        Image: atmoz/sftp         |              https://hub.docker.com/r/atmoz/sftp              |
 | 4 |    Spring Boot 单元测试（五）自定义测试顺序    |          https://juejin.cn/post/7041886698464083998           |
 | 5 |             ChatGPT              |                                                               |
+| 6 |   🚩详解Java使用Jsch与sftp服务器实现ssh免密登录(憑證交換)      |      https://www.51cto.com/article/604692.html                  |
